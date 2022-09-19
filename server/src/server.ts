@@ -1,10 +1,14 @@
 import { Game, PrismaClient } from "@prisma/client";
+import cors from "cors";
 import { convertHourStringToMinute } from "./utils/convert-hour-string-to-minute";
+import { convertMinutesToHoursString } from "./utils/convert-minutes-to-hours-string";
 const express = require("express");
 const app = express();
 const port = 3001;
 
 app.use(express.json());
+
+app.use(cors());
 
 const prisma = new PrismaClient({
   log: ["query"],
@@ -66,6 +70,8 @@ app.get(
         id: true,
         name: true,
         weekDays: true,
+        hourStart: true,
+        hourEnd: true,
       },
       where: {
         gameId,
@@ -80,6 +86,8 @@ app.get(
         return {
           ...ad,
           weekDays: ad.weekDays.split(","),
+          hourStart: convertMinutesToHoursString(ad.hourStart),
+          hourEnd: convertMinutesToHoursString(ad.hourEnd),
         };
       })
     );
